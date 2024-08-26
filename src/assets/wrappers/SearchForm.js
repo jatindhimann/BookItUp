@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 const Wrapper = styled.div`
   margin-bottom: 6rem;
@@ -14,6 +14,6 @@ const Wrapper = styled.div`
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
-`;
+`
 
-export default Wrapper;
+export default Wrapper
