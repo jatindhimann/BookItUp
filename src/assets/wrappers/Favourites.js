@@ -21,6 +21,13 @@ const Wrapper = styled.section`
     font-size: 1.5rem;
     color: var(--grey-700);
   }
+
+  @media (max-width: 768px) {
+    .favourites-container {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+  }
 `
 
 export default Wrapper
