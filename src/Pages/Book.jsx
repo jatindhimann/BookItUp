@@ -1,20 +1,35 @@
-import { useLoaderData, Link } from 'react-router-dom'
+import { useLoaderData, Link, Navigate } from 'react-router-dom'
 import axios from 'axios'
 import Wrapper from '../assets/wrappers/BookPage'
 import { useFavourites } from '../Components/FavouritesContext' // Adjust path as necessary
 import { toast } from 'react-toastify'
+import { useQuery } from '@tanstack/react-query'
 
 const singleBookUrl = 'https://www.googleapis.com/books/v1/volumes/'
 
-export const loader = async ({ params }) => {
-  const { id } = params
-  const { data } = await axios.get(`${singleBookUrl}${id}`)
-  return { id, data }
+const singleBookQuery = (id)=>{
+  return {
+    queryKey:['cocktail',id],
+    queryFn:async()=>{
+      const { data } = await axios.get(`${singleBookUrl}${id}`)
+      return data;
+    }
+  }
 }
+export const loader =
+  (queryClient) =>
+  async ({ params }) => {
+    const { id } = params
+    await queryClient.ensureQueryData(singleBookQuery(id));
+    return { id }
+  }
 
 const Book = () => {
-  const { id, data } = useLoaderData()
+  const { id } = useLoaderData()
   const { addToFavourites, isFavourite } = useFavourites()
+
+  const {data} = useQuery(singleBookQuery(id));
+  if (!data) return <Navigate to="/" />
 
   const image = data.volumeInfo.imageLinks?.smallThumbnail
   const title = data.volumeInfo.title
@@ -63,16 +78,12 @@ const Book = () => {
           {amount && <h4>Price: ${amount}</h4>}
           <p dangerouslySetInnerHTML={{ __html: description }}></p>
           <div className="button-group">
-            <a
-              href="#"
+            <button
               className={`btn-favourites ${isBookFavourite ? 'remove' : 'add'}`}
-              onClick={(e) => {
-                e.preventDefault()
-                handleAddToFavourites()
-              }}
+              onClick={handleAddToFavourites}
             >
               {isBookFavourite ? 'Remove from Favourites' : 'Add to Favourites'}
-            </a>
+            </button>
             {preview && (
               <a
                 href={preview}
